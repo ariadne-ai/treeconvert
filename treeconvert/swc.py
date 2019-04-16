@@ -26,6 +26,8 @@ from dataclasses import dataclass
 from enum import IntEnum
 
 
+__all__ = ['StructureIdentifier', 'Edge', 'SwcData']
+
 # Structure identifiers based on CNIC data, c.f.
 # http://www.neuronland.org/NLMorphologyConverter/MorphologyFormats/SWC/Spec.html
 # Note that by using the functional API, multiple labels can point to
@@ -74,6 +76,7 @@ class Edge:
     parent_sample: int
 
     def __str__(self):
+        # Creates the line for this edge for an SWC file
         return ' '.join(str(x) for x in vars(self).values())
 
     @classmethod
@@ -91,27 +94,34 @@ class Edge:
 
 
 class SwcData(collections.abc.MutableSequence):
+    """This class implements a list of `Edge' objects. Since SWC files
+    are line-based, the position of an Edge in this list corresponds to
+    the line number in the final SWC file.
+
+    The overridden call `str(SwcData)` will output the complete, valid
+    SWC file.
+
+    """
     def __init__(self, *args):
-        self.nodes = []
+        self.edges = []
         self.extend(list(args))
 
     def insert(self, index: int, item: Edge) -> None:
         if not isinstance(item, Edge):
             raise TypeError(f'Item must be of type {Edge}!')
-        self.nodes.append(item)
+        self.edges.insert(index, item)
 
     def __getitem__(self, i: int) -> Edge:
-        return self.nodes[i]
+        return self.edges[i]
 
     def __setitem__(self, i: int, o: Edge) -> None:
         self.insert(i, o)
 
     def __delitem__(self, i: int) -> None:
-        del self.nodes[i]
+        del self[i]
 
     def __len__(self) -> int:
-        return len(self.nodes)
+        return len(self.edges)
 
     def __str__(self):
-        # This returns a complete SWC file by combining all of its Edges
         return '\n'.join(str(edge) for edge in self)
