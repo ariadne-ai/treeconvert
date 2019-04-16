@@ -28,11 +28,15 @@ from enum import IntEnum
 
 # Structure identifiers based on CNIC data, c.f.
 # http://www.neuronland.org/NLMorphologyConverter/MorphologyFormats/SWC/Spec.html
+# Note that by using the functional API, multiple labels can point to
+# the same value (e.g. "BASAL" and "BASAL DENDRITE".)
+# c.f. https://docs.python.org/3/library/enum.html#functional-api
 StructureIdentifier = IntEnum(value='StructureIdentifier',
                               names=[('UNDEFINED', 0),
                                      ('SOMA', 1),
                                      ('AXON', 2),
                                      ('DENDRITE', 3),
+                                     ('BASAL', 3),
                                      ('BASAL DENDRITE', 3),
                                      ('(BASAL) DENDRITE', 3),
                                      ('APICAL', 4),
@@ -40,6 +44,20 @@ StructureIdentifier = IntEnum(value='StructureIdentifier',
                                      ('FORK POINT', 5),
                                      ('END POINT', 6),
                                      ('CUSTOM', 7)])
+
+
+# One drawback of the functional API is that methods overrides must be
+# defined outside.
+def StructureIdentifier_missing_(value):
+    """Tries to find a fitting enum member, otherwise returns UNDEFINED."""
+    try:
+        return StructureIdentifier._member_map_[value.upper()]
+    except KeyError:
+        return StructureIdentifier.UNDEFINED
+
+
+StructureIdentifier.__str__ = lambda self: str(self.value)
+StructureIdentifier._missing_ = StructureIdentifier_missing_
 
 
 @dataclass
@@ -60,10 +78,10 @@ class Edge:
 
     @classmethod
     def from_nml_entry(cls, node: dict, parent_id: int):
-        try:
-            structure_identifier = StructureIdentifier[node['comment'].upper()]
-        except TypeError:
-            structure_identifier = StructureIdentifier['UNDEFINED']
+        # You can dismiss "'IntEnum' object is not callable" because
+        # this call gets propagated to `StructureIdentifier_missing_'
+        # defined above.
+        structure_identifier = StructureIdentifier(node['comment'])
         return Edge(node['id'], structure_identifier,
                     node['x'], node['y'], node['z'], node['radius'], parent_id)
 
