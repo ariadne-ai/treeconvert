@@ -50,12 +50,13 @@ args = parser.parse_args()
 
 input_file = Path(args.input_file)
 with input_file.open() as f:
-    content = f.read()
-
-nml = nml_to_dict(content, args.from_format == FileFormats.PYKNOSSOS_NML)
+    nml = nml_to_dict(f.read(), args.from_format == FileFormats.PYKNOSSOS_NML)
 
 for i, thing in enumerate(nml['things']):
-    swc = nml_to_swc(nml['things'][i])
+    # <node_0_based /> is an empty tag whose existence determines
+    # whether the coordinates are 0-based. If the tag exists, its value
+    # in <parameters> will be '', otherwise its value is `False'.
+    swc = nml_to_swc(nml['things'][i], nml['parameters']['nodes_0_based'] == '')
 
     if len(nml['things']) == 1:
         output_file = f'{input_file.stem}.swc'

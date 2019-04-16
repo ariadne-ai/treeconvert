@@ -77,13 +77,17 @@ class Edge:
         return ' '.join(str(x) for x in vars(self).values())
 
     @classmethod
-    def from_nml_entry(cls, node: dict, parent_id: int):
+    def from_nml_entry(cls, node: dict, parent_id: int, is_zero_based=False):
         # You can dismiss "'IntEnum' object is not callable" because
         # this call gets propagated to `StructureIdentifier_missing_'
         # defined above.
         structure_identifier = StructureIdentifier(node['comment'])
-        return Edge(node['id'], structure_identifier,
-                    node['x'], node['y'], node['z'], node['radius'], parent_id)
+        if is_zero_based:
+            x, y, z = node['x'], node['y'], node['z']
+        else:
+            x, y, z = node['x'] - 1, node['y'] - 1, node['z'] - 1
+        return Edge(node['id'], structure_identifier, x, y, z, node['radius'],
+                    parent_id)
 
 
 class SwcData(collections.abc.MutableSequence):

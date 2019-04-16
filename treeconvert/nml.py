@@ -41,6 +41,7 @@ parameters = declxml.dictionary('parameters', [
         declxml.string('.', attribute='path'),
         declxml.integer('.', attribute='overlay')
     ], required=False),
+    declxml.string('nodes_0_based', required=False, default=False)
 ], required=False)
 
 node_processor = declxml.dictionary('node', [

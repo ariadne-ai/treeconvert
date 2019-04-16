@@ -69,7 +69,7 @@ def nml_to_dict(xml_str: str, is_pyknossos=False) -> dict:
         raise ParseError(str(error))
 
 
-def nml_to_swc(nml: dict) -> SwcData:
+def nml_to_swc(nml: dict, is_zero_based=False) -> SwcData:
     nodes = {node['id']: node for node in nml['nodes']}
     targets = defaultdict(list, {
         target: [edge['source'] for edge in list(edges)]
@@ -92,7 +92,7 @@ def nml_to_swc(nml: dict) -> SwcData:
         first_node = set(nodes).pop()
 
     swc = SwcData()
-    swc.append(Edge.from_nml_entry(nodes[first_node], -1))
+    swc.append(Edge.from_nml_entry(nodes[first_node], -1, is_zero_based))
 
     next_nodes = deque([first_node])
     visited = set()
@@ -105,5 +105,5 @@ def nml_to_swc(nml: dict) -> SwcData:
             if neighbor in visited:
                 continue
             next_nodes.append(neighbor)
-            swc.append(Edge.from_nml_entry(nodes[neighbor], node))
+            swc.append(Edge.from_nml_entry(nodes[neighbor], node, is_zero_based))
     return swc
