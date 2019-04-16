@@ -60,7 +60,7 @@ for i, thing in enumerate(nml['things']):
     if len(nml['things']) == 1:
         output_file = f'{input_file.stem}.swc'
     else:
-        # Append index to filename
+        # There are multiple trees, so separate them by their index
         output_file = f'{input_file.stem}.swc.{i + 1}'
 
     if args.force is False and isfile(output_file):

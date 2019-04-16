@@ -3,15 +3,17 @@ treeconvert
 ===========
 
 ``treeconvert`` converts NML files [1]_ to SWC [2]_. This allows you to view
-skeletal reconstructions created in (Py)KNOSSOS in viewers for SWC files.
-
-The current version (0.9) is currently a little bit restricted:
-
-- Conversion is only possible from (Py)KNOSSOS NML to SWC, not back.
-- SWC’s *structure identifier* is ``UNDEFINED`` for all edges.
+(Py)KNOSSOS skeletal reconstructions in SWC viewers, e.g. Amira.
 
 If the NML file consists of multiple trees, a separate SWC file will get
 created for each one.
+
+``treeconvert`` will automatically assign the numeric value of an SWC
+*structure identifier* if there is a corresponding *comment* in the NML node.
+There exist different conventions on which numeric value to use for an
+identifier, so ``treeconvert`` will use those of “CNIC data” described here
+[2]_ and `here <https://web.archive.org/web/20170324162931/research.mssm.edu/cnic/swc.html>`_
+(archive.org, last retrieved on April 16th, 2019).
 
 .. [1] For more information about NML files, visit https://github.com/scalableminds/nml-spec.
 .. [2] http://www.neuronland.org/NLMorphologyConverter/MorphologyFormats/SWC/Spec.html
@@ -65,7 +67,7 @@ Usage
 	with its index.
 
 There a subtle differences between NML files created from KNOSSOS and those
-created from PyKNOSSOS. Because of this, the input format must either be
+created from PyKNOSSOS. Because of this, the input format must explicitly be
 ``nml`` or ``pyknossos_nml``.
 
 
