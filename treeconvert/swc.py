@@ -26,23 +26,20 @@ from dataclasses import dataclass
 from enum import IntEnum
 
 
-class StructureIdentifier(IntEnum):
-    """Standardized identifiers for SWC (www.neuromorpho.org) -
-
-    """
-    UNDEFINED = 0
-    SOMA = 1
-    AXON = 2
-    BASAL_DENDRITE = 3
-    APICAL_DENDRITE = 4
-    CUSTOM = 5
-
-    @classmethod
-    def _missing_(cls, value):
-        return StructureIdentifier.CUSTOM
-
-    def __str__(self):
-        return str(self.value)
+# Structure identifiers based on CNIC data, c.f.
+# http://www.neuronland.org/NLMorphologyConverter/MorphologyFormats/SWC/Spec.html
+StructureIdentifier = IntEnum(value='StructureIdentifier',
+                              names=[('UNDEFINED', 0),
+                                     ('SOMA', 1),
+                                     ('AXON', 2),
+                                     ('DENDRITE', 3),
+                                     ('BASAL DENDRITE', 3),
+                                     ('(BASAL) DENDRITE', 3),
+                                     ('APICAL', 4),
+                                     ('APICAL DENDRITE', 4),
+                                     ('FORK POINT', 5),
+                                     ('END POINT', 6),
+                                     ('CUSTOM', 7)])
 
 
 @dataclass
@@ -64,9 +61,9 @@ class Edge:
     @classmethod
     def from_nml_entry(cls, node: dict, parent_id: int):
         try:
-            structure_identifier = StructureIdentifier(node['comment'])
-        except KeyError:
-            structure_identifier = StructureIdentifier(0)
+            structure_identifier = StructureIdentifier[node['comment'].upper()]
+        except TypeError:
+            structure_identifier = StructureIdentifier['UNDEFINED']
         return Edge(node['id'], structure_identifier,
                     node['x'], node['y'], node['z'], node['radius'], parent_id)
 
